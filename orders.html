@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pedidos - Gestión de Negocios</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/orders.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <h2>Panel de Control</h2>
+                <button class="settings-btn" onclick="openSettings()">
+                    <i class="fas fa-cog"></i>
+                </button>
+            </div>
+            
+            <div class="nav-menu">
+                <a href="index.html" class="nav-item">
+                    <i class="fas fa-home"></i>
+                    <span>Inicio</span>
+                </a>
+                <a href="products.html" class="nav-item">
+                    <i class="fas fa-box"></i>
+                    <span>Productos</span>
+                </a>
+                <a href="inventory.html" class="nav-item">
+                    <i class="fas fa-warehouse"></i>
+                    <span>Inventario</span>
+                </a>
+                <a href="sales.html" class="nav-item">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Ventas</span>
+                </a>
+                <a href="orders.html" class="nav-item active">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>Pedidos</span>
+                </a>
+                <a href="deliveries.html" class="nav-item">
+                    <i class="fas fa-truck"></i>
+                    <span>Entregas</span>
+                </a>
+                <a href="clients.html" class="nav-item">
+                    <i class="fas fa-users"></i>
+                    <span>Clientes</span>
+                </a>
+                <a href="tasks.html" class="nav-item">
+                    <i class="fas fa-tasks"></i>
+                    <span>Tareas</span>
+                </a>
+            </div>
+            
+            <div class="sidebar-footer">
+                <button class="logout-btn" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Cerrar Sesión</span>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="page-header">
+                <div class="header-left">
+                    <h1>Pedidos en Línea</h1>
+                    <p class="page-subtitle">Gestiona los pedidos de tu tienda online</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-secondary" onclick="exportOrders()">
+                        <i class="fas fa-download"></i>
+                        <span>Exportar</span>
+                    </button>
+                    <button class="btn btn-primary" onclick="openOrderModal()">
+                        <i class="fas fa-plus"></i>
+                        <span>Nuevo Pedido</span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Orders Summary Cards -->
+            <div class="orders-summary">
+                <div class="summary-card pending-orders">
+                    <div class="card-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="card-content">
+                        <h3>Pendientes</h3>
+                        <div class="metric-value" id="pending-orders-count">0</div>
+                        <div class="metric-subtitle">Requieren atención</div>
+                    </div>
+                </div>
+                
+                <div class="summary-card processing-orders">
+                    <div class="card-icon">
+                        <i class="fas fa-cog"></i>
+                    </div>
+                    <div class="card-content">
+                        <h3>En Proceso</h3>
+                        <div class="metric-value" id="processing-orders-count">0</div>
+                        <div class="metric-subtitle">Siendo preparados</div>
+                    </div>
+                </div>
+                
+                <div class="summary-card ready-orders">
+                    <div class="card-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="card-content">
+                        <h3>Listos</h3>
+                        <div class="metric-value" id="ready-orders-count">0</div>
+                        <div class="metric-subtitle">Para entrega</div>
+                    </div>
+                </div>
+                
+                <div class="summary-card completed-orders">
+                    <div class="card-icon">
+                        <i class="fas fa-truck"></i>
+                    </div>
+                    <div class="card-content">
+                        <h3>Entregados</h3>
+                        <div class="metric-value" id="completed-orders-count">0</div>
+                        <div class="metric-subtitle">Hoy</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filters and Search -->
+            <div class="filters-section">
+                <div class="search-container">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="search-orders" placeholder="Buscar pedidos por ID, cliente...">
+                    </div>
+                </div>
+                
+                <div class="filter-tabs">
+                    <button class="filter-tab active" data-status="all">
+                        <span>Todos</span>
+                        <span class="tab-count" id="count-all">0</span>
+                    </button>
+                    <button class="filter-tab" data-status="pending">
+                        <span>Pendientes</span>
+                        <span class="tab-count" id="count-pending">0</span>
+                    </button>
+                    <button class="filter-tab" data-status="processing">
+                        <span>En Proceso</span>
+                        <span class="tab-count" id="count-processing">0</span>
+                    </button>
+                    <button class="filter-tab" data-status="ready">
+                        <span>Listos</span>
+                        <span class="tab-count" id="count-ready">0</span>
+                    </button>
+                    <button class="filter-tab" data-status="completed">
+                        <span>Completados</span>
+                        <span class="tab-count" id="count-completed">0</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Orders Grid -->
+            <div class="orders-container">
+                <div class="orders-grid" id="orders-grid">
+                    <!-- Los pedidos se cargarán dinámicamente aquí -->
+                </div>
+                
+                <!-- Empty State -->
+                <div class="empty-state" id="orders-empty-state" style="display: none;">
+                    <div class="empty-icon">
+                        <i class="fas fa-shopping-cart"></i>
+                    </div>
+                    <h3>No hay pedidos</h3>
+                    <p>Los pedidos de tu tienda online aparecerán aquí</p>
+                    <button class="btn btn-primary" onclick="openOrderModal()">
+                        <i class="fas fa-plus"></i>
+                        <span>Crear Primer Pedido</span>
+                    </button>
+                </div>
+                
+                <!-- Loading State -->
+                <div class="loading-state" id="orders-loading-state">
+                    <div class="loading-spinner">
+                        <i class="fas fa-spinner fa-spin"></i>
+                    </div>
+                    <p>Cargando pedidos...</p>
+                </div>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination-container" id="orders-pagination" style="display: none;">
+                <div class="pagination-info">
+                    <span id="orders-pagination-info">Mostrando 1-10 de 25 pedidos</span>
+                </div>
+                <div class="pagination-controls">
+                    <button class="btn btn-secondary" id="orders-prev-page" disabled>
+                        <i class="fas fa-chevron-left"></i>
+                        <span>Anterior</span>
+                    </button>
+                    <div class="page-numbers" id="orders-page-numbers">
+                        <!-- Los números de página se generarán dinámicamente -->
+                    </div>
+                    <button class="btn btn-secondary" id="orders-next-page">
+                        <span>Siguiente</span>
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Order Modal -->
+    <div id="order-modal" class="modal">
+        <div class="modal-content modal-lg">
+            <div class="modal-header">
+                <h3 id="order-modal-title">Nuevo Pedido</h3>
+                <button class="close-btn" onclick="closeOrderModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="order-form" class="modal-body">
+                <div class="customer-section">
+                    <h4>Información del Cliente</h4>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="customer-name" class="required">Nombre</label>
+                            <input type="text" id="customer-name" name="customerName" required placeholder="Nombre completo">
+                        </div>
+                        <div class="form-group">
+                            <label for="customer-phone" class="required">Teléfono</label>
+                            <input type="tel" id="customer-phone" name="customerPhone" required placeholder="Número de teléfono">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="customer-address" class="required">Dirección de Entrega</label>
+                        <textarea id="customer-address" name="customerAddress" required rows="2" placeholder="Dirección completa para la entrega"></textarea>
+                    </div>
+                </div>
+                
+                <div class="products-section">
+                    <div class="section-header">
+                        <h4>Productos</h4>
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="addProductToOrder()">
+                            <i class="fas fa-plus"></i>
+                            <span>Agregar Producto</span>
+                        </button>
+                    </div>
+                    
+                    <div class="products-list" id="order-products-list">
+                        <!-- Los productos se agregarán dinámicamente aquí -->
+                    </div>
+                </div>
+                
+                <div class="order-summary">
+                    <div class="summary-row">
+                        <span>Subtotal:</span>
+                        <span id="order-subtotal">$0.00</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Envío:</span>
+                        <span id="order-shipping">$0.00</span>
+                    </div>
+                    <div class="summary-row total">
+                        <span>Total:</span>
+                        <span id="order-total">$0.00</span>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="delivery-fee">Costo de Envío</label>
+                        <div class="input-group">
+                            <span class="input-prefix">$</span>
+                            <input type="number" id="delivery-fee" name="deliveryFee" min="0" step="0.01" value="0" placeholder="0.00">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="payment-method">Método de Pago</label>
+                        <select id="payment-method" name="paymentMethod" required>
+                            <option value="">Seleccionar método</option>
+                            <option value="cash">Efectivo</option>
+                            <option value="card">Tarjeta</option>
+                            <option value="transfer">Transferencia</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="order-notes">Notas del Pedido</label>
+                    <textarea id="order-notes" name="notes" rows="3" placeholder="Instrucciones especiales, comentarios..."></textarea>
+                </div>
+            </form>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeOrderModal()">Cancelar</button>
+                <button type="submit" form="order-form" class="btn btn-primary" id="save-order-btn">
+                    <span class="btn-text">Crear Pedido</span>
+                    <div class="btn-loader" style="display: none;">
+                        <i class="fas fa-spinner fa-spin"></i>
+                    </div>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Order Details Modal -->
+    <div id="order-details-modal" class="modal">
+        <div class="modal-content modal-lg">
+            <div class="modal-header">
+                <h3 id="order-details-title">Detalles del Pedido</h3>
+                <button class="close-btn" onclick="closeOrderDetailsModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="order-details-content">
+                <!-- Los detalles se cargarán dinámicamente aquí -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeOrderDetailsModal()">Cerrar</button>
+                <button type="button" class="btn btn-primary" onclick="printOrderReceipt()">
+                    <i class="fas fa-print"></i>
+                    <span>Imprimir</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Error/Success Messages -->
+    <div id="message-container" class="message-container"></div>
+
+    <script src="js/config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/orders.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
+

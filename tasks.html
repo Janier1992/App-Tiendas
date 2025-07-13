@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tareas - Gestión de Negocios</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/tasks.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <h2>Panel de Control</h2>
+                <button class="settings-btn" onclick="openSettings()">
+                    <i class="fas fa-cog"></i>
+                </button>
+            </div>
+            
+            <div class="nav-menu">
+                <a href="index.html" class="nav-item">
+                    <i class="fas fa-home"></i>
+                    <span>Inicio</span>
+                </a>
+                <a href="products.html" class="nav-item">
+                    <i class="fas fa-box"></i>
+                    <span>Productos</span>
+                </a>
+                <a href="inventory.html" class="nav-item">
+                    <i class="fas fa-warehouse"></i>
+                    <span>Inventario</span>
+                </a>
+                <a href="sales.html" class="nav-item">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Ventas</span>
+                </a>
+                <a href="orders.html" class="nav-item">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>Pedidos</span>
+                </a>
+                <a href="deliveries.html" class="nav-item">
+                    <i class="fas fa-truck"></i>
+                    <span>Entregas</span>
+                </a>
+                <a href="clients.html" class="nav-item">
+                    <i class="fas fa-users"></i>
+                    <span>Clientes</span>
+                </a>
+                <a href="tasks.html" class="nav-item active">
+                    <i class="fas fa-tasks"></i>
+                    <span>Tareas</span>
+                </a>
+            </div>
+            
+            <div class="sidebar-footer">
+                <button class="logout-btn" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Cerrar Sesión</span>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="page-header">
+                <div class="header-left">
+                    <h1>Tareas Personales</h1>
+                    <p class="page-subtitle">Organiza y gestiona tus tareas diarias</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-primary" onclick="openTaskModal()">
+                        <i class="fas fa-plus"></i>
+                        <span>Nueva Tarea</span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Tasks Summary Cards -->
+            <div class="tasks-summary">
+                <div class="summary-card pending-tasks">
+                    <div class="card-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="card-content">
+                        <h3>Pendientes</h3>
+                        <div class="metric-value" id="pending-tasks-count">0</div>
+                        <div class="metric-subtitle">Por completar</div>
+                    </div>
+                </div>
+                
+                <div class="summary-card completed-tasks">
+                    <div class="card-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="card-content">
+                        <h3>Completadas</h3>
+                        <div class="metric-value" id="completed-tasks-count">0</div>
+                        <div class="metric-subtitle">Hoy</div>
+                    </div>
+                </div>
+                
+                <div class="summary-card overdue-tasks">
+                    <div class="card-icon">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="card-content">
+                        <h3>Vencidas</h3>
+                        <div class="metric-value" id="overdue-tasks-count">0</div>
+                        <div class="metric-subtitle">Requieren atención</div>
+                    </div>
+                </div>
+                
+                <div class="summary-card productivity">
+                    <div class="card-icon">
+                        <i class="fas fa-chart-pie"></i>
+                    </div>
+                    <div class="card-content">
+                        <h3>Productividad</h3>
+                        <div class="metric-value" id="productivity-percentage">0%</div>
+                        <div class="metric-subtitle">Esta semana</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filters and Search -->
+            <div class="filters-section">
+                <div class="search-container">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="search-tasks" placeholder="Buscar tareas...">
+                    </div>
+                </div>
+                
+                <div class="filter-tabs">
+                    <button class="filter-tab active" data-status="all">
+                        <span>Todas</span>
+                        <span class="tab-count" id="count-all">0</span>
+                    </button>
+                    <button class="filter-tab" data-status="pending">
+                        <span>Pendientes</span>
+                        <span class="tab-count" id="count-pending">0</span>
+                    </button>
+                    <button class="filter-tab" data-status="completed">
+                        <span>Completadas</span>
+                        <span class="tab-count" id="count-completed">0</span>
+                    </button>
+                    <button class="filter-tab" data-status="overdue">
+                        <span>Vencidas</span>
+                        <span class="tab-count" id="count-overdue">0</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tasks List -->
+            <div class="tasks-container">
+                <div class="tasks-list" id="tasks-list">
+                    <!-- Las tareas se cargarán dinámicamente aquí -->
+                </div>
+                
+                <!-- Empty State -->
+                <div class="empty-state" id="tasks-empty-state" style="display: none;">
+                    <div class="empty-icon">
+                        <i class="fas fa-tasks"></i>
+                    </div>
+                    <h3>No hay tareas</h3>
+                    <p>Comienza agregando tu primera tarea</p>
+                    <button class="btn btn-primary" onclick="openTaskModal()">
+                        <i class="fas fa-plus"></i>
+                        <span>Crear Primera Tarea</span>
+                    </button>
+                </div>
+                
+                <!-- Loading State -->
+                <div class="loading-state" id="tasks-loading-state">
+                    <div class="loading-spinner">
+                        <i class="fas fa-spinner fa-spin"></i>
+                    </div>
+                    <p>Cargando tareas...</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Task Modal -->
+    <div id="task-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="task-modal-title">Nueva Tarea</h3>
+                <button class="close-btn" onclick="closeTaskModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="task-form" class="modal-body">
+                <div class="form-group">
+                    <label for="task-title" class="required">Título</label>
+                    <input type="text" id="task-title" name="title" required placeholder="¿Qué necesitas hacer?">
+                </div>
+                
+                <div class="form-group">
+                    <label for="task-description">Descripción</label>
+                    <textarea id="task-description" name="description" rows="3" placeholder="Detalles adicionales..."></textarea>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="task-priority">Prioridad</label>
+                        <select id="task-priority" name="priority">
+                            <option value="low">Baja</option>
+                            <option value="medium" selected>Media</option>
+                            <option value="high">Alta</option>
+                            <option value="urgent">Urgente</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="task-due-date">Fecha Límite</label>
+                        <input type="datetime-local" id="task-due-date" name="dueDate">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="task-category">Categoría</label>
+                    <select id="task-category" name="category">
+                        <option value="">Sin categoría</option>
+                        <option value="work">Trabajo</option>
+                        <option value="personal">Personal</option>
+                        <option value="business">Negocio</option>
+                        <option value="urgent">Urgente</option>
+                        <option value="follow-up">Seguimiento</option>
+                    </select>
+                </div>
+            </form>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeTaskModal()">Cancelar</button>
+                <button type="submit" form="task-form" class="btn btn-primary" id="save-task-btn">
+                    <span class="btn-text">Guardar Tarea</span>
+                    <div class="btn-loader" style="display: none;">
+                        <i class="fas fa-spinner fa-spin"></i>
+                    </div>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="delete-task-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Confirmar Eliminación</h3>
+                <button class="close-btn" onclick="closeDeleteTaskModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="delete-warning">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <p>¿Estás seguro de que quieres eliminar esta tarea?</p>
+                    <p><strong id="delete-task-title"></strong></p>
+                    <small>Esta acción no se puede deshacer.</small>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeDeleteTaskModal()">Cancelar</button>
+                <button type="button" class="btn btn-danger" id="confirm-delete-task-btn" onclick="confirmDeleteTask()">
+                    <span class="btn-text">Eliminar</span>
+                    <div class="btn-loader" style="display: none;">
+                        <i class="fas fa-spinner fa-spin"></i>
+                    </div>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Error/Success Messages -->
+    <div id="message-container" class="message-container"></div>
+
+    <script src="js/config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/tasks.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
+

@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ventas - Gestión de Negocios</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/sales.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <h2>Panel de Control</h2>
+                <button class="settings-btn" onclick="openSettings()">
+                    <i class="fas fa-cog"></i>
+                </button>
+            </div>
+            
+            <div class="nav-menu">
+                <a href="index.html" class="nav-item">
+                    <i class="fas fa-home"></i>
+                    <span>Inicio</span>
+                </a>
+                <a href="products.html" class="nav-item">
+                    <i class="fas fa-box"></i>
+                    <span>Productos</span>
+                </a>
+                <a href="inventory.html" class="nav-item">
+                    <i class="fas fa-warehouse"></i>
+                    <span>Inventario</span>
+                </a>
+                <a href="sales.html" class="nav-item active">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Ventas</span>
+                </a>
+                <a href="orders.html" class="nav-item">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>Pedidos</span>
+                </a>
+                <a href="deliveries.html" class="nav-item">
+                    <i class="fas fa-truck"></i>
+                    <span>Entregas</span>
+                </a>
+                <a href="clients.html" class="nav-item">
+                    <i class="fas fa-users"></i>
+                    <span>Clientes</span>
+                </a>
+                <a href="tasks.html" class="nav-item">
+                    <i class="fas fa-tasks"></i>
+                    <span>Tareas</span>
+                </a>
+            </div>
+            
+            <div class="sidebar-footer">
+                <button class="logout-btn" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Cerrar Sesión</span>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="page-header">
+                <div class="header-left">
+                    <h1>Ventas</h1>
+                    <p class="page-subtitle">Gestiona tus ventas y reportes</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-secondary" onclick="exportSales()">
+                        <i class="fas fa-download"></i>
+                        <span>Exportar</span>
+                    </button>
+                    <button class="btn btn-primary" onclick="openSaleModal()">
+                        <i class="fas fa-plus"></i>
+                        <span>Nueva Venta</span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Sales Summary Cards -->
+            <div class="sales-summary">
+                <div class="summary-card total-sales">
+                    <div class="card-icon">
+                        <i class="fas fa-dollar-sign"></i>
+                    </div>
+                    <div class="card-content">
+                        <h3>Ventas Totales</h3>
+                        <div class="metric-value" id="total-sales-amount">$0</div>
+                        <div class="metric-change positive" id="sales-change">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>+0%</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="summary-card total-orders">
+                    <div class="card-icon">
+                        <i class="fas fa-shopping-cart"></i>
+                    </div>
+                    <div class="card-content">
+                        <h3>Órdenes</h3>
+                        <div class="metric-value" id="total-orders-count">0</div>
+                        <div class="metric-change positive" id="orders-change">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>+0%</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="summary-card avg-order">
+                    <div class="card-icon">
+                        <i class="fas fa-receipt"></i>
+                    </div>
+                    <div class="card-content">
+                        <h3>Ticket Promedio</h3>
+                        <div class="metric-value" id="avg-order-value">$0</div>
+                        <div class="metric-change neutral" id="avg-change">
+                            <i class="fas fa-minus"></i>
+                            <span>0%</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="summary-card today-sales">
+                    <div class="card-icon">
+                        <i class="fas fa-calendar-day"></i>
+                    </div>
+                    <div class="card-content">
+                        <h3>Ventas Hoy</h3>
+                        <div class="metric-value" id="today-sales-amount">$0</div>
+                        <div class="metric-subtitle" id="today-orders-count">0 órdenes</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sales Chart -->
+            <div class="chart-section">
+                <div class="chart-header">
+                    <h3>Tendencia de Ventas</h3>
+                    <div class="chart-controls">
+                        <select id="chart-period">
+                            <option value="7">Últimos 7 días</option>
+                            <option value="30" selected>Últimos 30 días</option>
+                            <option value="90">Últimos 3 meses</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="sales-chart"></canvas>
+                </div>
+            </div>
+
+            <!-- Filters and Search -->
+            <div class="filters-section">
+                <div class="search-container">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="search-sales" placeholder="Buscar ventas...">
+                    </div>
+                </div>
+                
+                <div class="filter-controls">
+                    <div class="filter-group">
+                        <label for="date-filter">Período:</label>
+                        <select id="date-filter">
+                            <option value="today">Hoy</option>
+                            <option value="week">Esta semana</option>
+                            <option value="month" selected>Este mes</option>
+                            <option value="quarter">Este trimestre</option>
+                            <option value="year">Este año</option>
+                            <option value="custom">Personalizado</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="status-filter">Estado:</label>
+                        <select id="status-filter">
+                            <option value="all">Todos</option>
+                            <option value="completed">Completadas</option>
+                            <option value="pending">Pendientes</option>
+                            <option value="cancelled">Canceladas</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="sort-sales">Ordenar por:</label>
+                        <select id="sort-sales">
+                            <option value="date">Fecha</option>
+                            <option value="amount">Monto</option>
+                            <option value="customer">Cliente</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="date-range-picker" id="date-range-picker" style="display: none;">
+                    <div class="date-inputs">
+                        <input type="date" id="start-date" placeholder="Fecha inicio">
+                        <input type="date" id="end-date" placeholder="Fecha fin">
+                        <button class="btn btn-secondary" onclick="applyDateRange()">Aplicar</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sales Table -->
+            <div class="sales-container">
+                <div class="sales-table-container">
+                    <table class="sales-table" id="sales-table">
+                        <thead>
+                            <tr>
+                                <th>ID Venta</th>
+                                <th>Cliente</th>
+                                <th>Productos</th>
+                                <th>Total</th>
+                                <th>Estado</th>
+                                <th>Método de Pago</th>
+                                <th>Fecha</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="sales-tbody">
+                            <!-- Los datos se cargarán dinámicamente aquí -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Empty State -->
+                <div class="empty-state" id="sales-empty-state" style="display: none;">
+                    <div class="empty-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3>No hay ventas registradas</h3>
+                    <p>Comienza registrando tu primera venta</p>
+                    <button class="btn btn-primary" onclick="openSaleModal()">
+                        <i class="fas fa-plus"></i>
+                        <span>Registrar Primera Venta</span>
+                    </button>
+                </div>
+                
+                <!-- Loading State -->
+                <div class="loading-state" id="sales-loading-state">
+                    <div class="loading-spinner">
+                        <i class="fas fa-spinner fa-spin"></i>
+                    </div>
+                    <p>Cargando ventas...</p>
+                </div>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination-container" id="sales-pagination" style="display: none;">
+                <div class="pagination-info">
+                    <span id="sales-pagination-info">Mostrando 1-10 de 25 ventas</span>
+                </div>
+                <div class="pagination-controls">
+                    <button class="btn btn-secondary" id="sales-prev-page" disabled>
+                        <i class="fas fa-chevron-left"></i>
+                        <span>Anterior</span>
+                    </button>
+                    <div class="page-numbers" id="sales-page-numbers">
+                        <!-- Los números de página se generarán dinámicamente -->
+                    </div>
+                    <button class="btn btn-secondary" id="sales-next-page">
+                        <span>Siguiente</span>
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Sale Modal -->
+    <div id="sale-modal" class="modal">
+        <div class="modal-content modal-lg">
+            <div class="modal-header">
+                <h3 id="sale-modal-title">Nueva Venta</h3>
+                <button class="close-btn" onclick="closeSaleModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="sale-form" class="modal-body">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="customer-name">Cliente</label>
+                        <input type="text" id="customer-name" name="customer" placeholder="Nombre del cliente">
+                    </div>
+                    <div class="form-group">
+                        <label for="customer-email">Email (Opcional)</label>
+                        <input type="email" id="customer-email" name="email" placeholder="email@ejemplo.com">
+                    </div>
+                </div>
+                
+                <div class="products-section">
+                    <div class="section-header">
+                        <h4>Productos</h4>
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="addProductToSale()">
+                            <i class="fas fa-plus"></i>
+                            <span>Agregar Producto</span>
+                        </button>
+                    </div>
+                    
+                    <div class="products-list" id="sale-products-list">
+                        <!-- Los productos se agregarán dinámicamente aquí -->
+                    </div>
+                </div>
+                
+                <div class="sale-summary">
+                    <div class="summary-row">
+                        <span>Subtotal:</span>
+                        <span id="sale-subtotal">$0.00</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Impuestos (0%):</span>
+                        <span id="sale-tax">$0.00</span>
+                    </div>
+                    <div class="summary-row total">
+                        <span>Total:</span>
+                        <span id="sale-total">$0.00</span>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="payment-method">Método de Pago</label>
+                        <select id="payment-method" name="paymentMethod" required>
+                            <option value="">Seleccionar método</option>
+                            <option value="cash">Efectivo</option>
+                            <option value="card">Tarjeta</option>
+                            <option value="transfer">Transferencia</option>
+                            <option value="other">Otro</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="sale-status">Estado</label>
+                        <select id="sale-status" name="status" required>
+                            <option value="completed">Completada</option>
+                            <option value="pending">Pendiente</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="sale-notes">Notas (Opcional)</label>
+                    <textarea id="sale-notes" name="notes" rows="3" placeholder="Notas adicionales sobre la venta..."></textarea>
+                </div>
+            </form>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeSaleModal()">Cancelar</button>
+                <button type="submit" form="sale-form" class="btn btn-primary" id="save-sale-btn">
+                    <span class="btn-text">Registrar Venta</span>
+                    <div class="btn-loader" style="display: none;">
+                        <i class="fas fa-spinner fa-spin"></i>
+                    </div>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sale Details Modal -->
+    <div id="sale-details-modal" class="modal">
+        <div class="modal-content modal-lg">
+            <div class="modal-header">
+                <h3 id="sale-details-title">Detalles de Venta</h3>
+                <button class="close-btn" onclick="closeSaleDetailsModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="sale-details-content">
+                <!-- Los detalles se cargarán dinámicamente aquí -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeSaleDetailsModal()">Cerrar</button>
+                <button type="button" class="btn btn-primary" onclick="printSaleReceipt()">
+                    <i class="fas fa-print"></i>
+                    <span>Imprimir Recibo</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Error/Success Messages -->
+    <div id="message-container" class="message-container"></div>
+
+    <script src="js/config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/sales.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
+
